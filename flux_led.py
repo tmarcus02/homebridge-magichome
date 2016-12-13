@@ -587,6 +587,11 @@ class WifiLedBulb():
 			msg.append(0x00)
 			msg.append(0x00)
 			msg.append(0xf0)
+		if setup == "RGBWWv1":
+			msg.append(0x00)
+			msg.append(0x00)
+			msg.append(0xf0)
+			msg.append(0x0f)
 		if setup == "RGBWWv3":
 			msg.append(0xff)
 			msg.append(0x00)
