@@ -596,6 +596,10 @@ class WifiLedBulb():
 			msg.append(0xff)
 			msg.append(0x00)
 			msg.append(0x0f)
+		if setup == "RGBWWv3a":
+			msg.append(0x00)
+			msg.append(0x00)
+			msg.append(0x0f)
 		self.__write(msg)
 
 	def setPresetPattern(self, pattern, speed):
