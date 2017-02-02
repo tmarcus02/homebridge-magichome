@@ -583,23 +583,24 @@ class WifiLedBulb():
 		if setup == "RGBW":
 			msg.append(0x00)
 			msg.append(0xf0)
-		if setup == "RGBWW":
+		if setup == "RGBWv3":
+			msg.append(0x00) """ White Option """
 			msg.append(0x00)
+			msg.append(0x0f)
+		if setup == "RGBWv3a":
+			msg.append(0x00) """ White Option """
+			msg.append(0x00)
+			msg.append(0x0f)
+		if setup == "RGBWW":
+			msg.append(0x00) """ White Option """
 			msg.append(0x00)
 			msg.append(0xf0)
 		if setup == "RGBWWv1":
-			msg.append(0x00)
-			msg.append(0x00)
+			msg.append(0x00) """ Warm White Option """
+			msg.append(0x00) """ Cool White Option """
 			msg.append(0xf0)
 			msg.append(0x0f)
-		if setup == "RGBWWv3":
-			msg.append(0xff)
-			msg.append(0x00)
-			msg.append(0x0f)
-		if setup == "RGBWWv3a":
-			msg.append(0x00)
-			msg.append(0x00)
-			msg.append(0x0f)
+		
 		self.__write(msg)
 
 	def setPresetPattern(self, pattern, speed):
