@@ -559,78 +559,48 @@ class WifiLedBulb():
 	def turnOff(self):
 		self.turnOn(False)
 
-def setWarmWhite(self, level, persist=True):
+	def setWarmWhite(self, level, persist=True):
+
 		if persist:
 			msg = bytearray([0x31])
 		else:
 			msg = bytearray([0x41])
-
-        # Red
 		msg.append(0x00)
-        # Green
 		msg.append(0x00)
-        # Blue
 		msg.append(0x00)
-
-		if setup == "RGBW":
-            # White Option
-			msg.append(utils.percentToByte(level))
-			msg.append(0xf0)
-		if setup == "RGBWv3":
-            # White Option
-			msg.append(utils.percentToByte(level))
-			msg.append(0x00)
-			msg.append(0x0f)
-		if setup == "RGBWv3a":
-            # White Option
-			msg.append(utils.percentToByte(level))
-			msg.append(0x00)
-			msg.append(0x0f)
-		if setup == "RGBWW":
-            # White Option
-			msg.append(utils.percentToByte(level))
-			msg.append(0x00)
-			msg.append(0xf0)
-		if setup == "RGBWWv1":
-            # Warm White Option - needs work
-			msg.append(0x00)
-            # Cool White Option - needs work
-			msg.append(0x00)
-			msg.append(0xf0)
-			msg.append(0x0f)
-
+		msg.append(utils.percentToByte(level))
+		msg.append(0x0f)
+		msg.append(0x0f)
 		self.__write(msg)
 
 	def setRgb(self, r,g,b, persist=True, setup="RGBW"):
+        
 		if persist:
 			msg = bytearray([0x31])
 		else:
 			msg = bytearray([0x41])
+
 		msg.append(r)
 		msg.append(g)
 		msg.append(b)
+
 		if setup == "RGBW":
 			msg.append(0x00)
 			msg.append(0xf0)
-		if setup == "RGBWv3":
-             # White Option
-			msg.append(0x00)
-			msg.append(0x00)
-			msg.append(0x0f)
-		if setup == "RGBWv3a":
-            # White Option
-			msg.append(0x00)
-			msg.append(0x00)
-			msg.append(0x0f)
+        if setup == "RGBWv3":
+            msg.append(0xff)
+            msg.append(0x00)
+            msg.append(0x0f)
+        if setup == "RGBWv3a":
+            msg.append(0x00)
+            msg.append(0x00)
+            msg.append(0x0f)
 		if setup == "RGBWW":
-            # White Option
 			msg.append(0x00)
 			msg.append(0x00)
 			msg.append(0xf0)
 		if setup == "RGBWWv1":
-            # Warm White Option
 			msg.append(0x00)
-            # Cool White Option
 			msg.append(0x00)
 			msg.append(0xf0)
 			msg.append(0x0f)
@@ -1305,7 +1275,7 @@ def main():
 
 		if options.ww is not None:
 			print "Setting warm white mode, level: {}%".format(options.ww)
-			bulb.setWarmWhite(options.ww, not options.volatile, options.setup)
+			bulb.setWarmWhite(options.ww, not options.volatile)
 
 		elif options.color is not None:
 			print "Setting color RGB:{}".format(options.color),
