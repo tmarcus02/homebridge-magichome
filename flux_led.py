@@ -559,37 +559,46 @@ class WifiLedBulb():
 	def turnOff(self):
 		self.turnOn(False)
 
-	def setWarmWhite(self, level, persist=True, setup="RGBW"):
+def setWarmWhite(self, level, persist=True, setup="RGBW"):
 		if persist:
 			msg = bytearray([0x31])
 		else:
 			msg = bytearray([0x41])
-			
-		msg.append(0x00)""" Red """
-		msg.append(0x00)""" Green """
-		msg.append(0x00)""" Blue"""
-		
+
+        # Red
+		msg.append(0x00)
+        # Green
+		msg.append(0x00)
+        # Blue
+		msg.append(0x00)
+
 		if setup == "RGBW":
-			msg.append(utils.percentToByte(level))""" White Option """
+            # White Option
+			msg.append(utils.percentToByte(level))
 			msg.append(0xf0)
 		if setup == "RGBWv3":
-			msg.append(utils.percentToByte(level))""" White Option """
+            # White Option
+			msg.append(utils.percentToByte(level))
 			msg.append(0x00)
 			msg.append(0x0f)
 		if setup == "RGBWv3a":
-			msg.append(utils.percentToByte(level))""" White Option """
+            # White Option
+			msg.append(utils.percentToByte(level))
 			msg.append(0x00)
 			msg.append(0x0f)
 		if setup == "RGBWW":
-			msg.append(utils.percentToByte(level))""" White Option """
+            # White Option
+			msg.append(utils.percentToByte(level))
 			msg.append(0x00)
 			msg.append(0xf0)
 		if setup == "RGBWWv1":
-			msg.append(0x00) """ Warm White Option - needs work"""
-			msg.append(0x00) """ Cool White Option - needs work """
+            # Warm White Option - needs work
+			msg.append(0x00)
+            # Cool White Option - needs work
+			msg.append(0x00)
 			msg.append(0xf0)
 			msg.append(0x0f)
-	
+
 		self.__write(msg)
 
 	def setRgb(self, r,g,b, persist=True, setup="RGBW"):
@@ -604,23 +613,28 @@ class WifiLedBulb():
 			msg.append(0x00)
 			msg.append(0xf0)
 		if setup == "RGBWv3":
-			msg.append(0x00) """ White Option """
+             # White Option
+			msg.append(0x00)
 			msg.append(0x00)
 			msg.append(0x0f)
 		if setup == "RGBWv3a":
-			msg.append(0x00) """ White Option """
+            # White Option
+			msg.append(0x00)
 			msg.append(0x00)
 			msg.append(0x0f)
 		if setup == "RGBWW":
-			msg.append(0x00) """ White Option """
+            # White Option
+			msg.append(0x00)
 			msg.append(0x00)
 			msg.append(0xf0)
 		if setup == "RGBWWv1":
-			msg.append(0x00) """ Warm White Option """
-			msg.append(0x00) """ Cool White Option """
+            # Warm White Option
+			msg.append(0x00)
+            # Cool White Option
+			msg.append(0x00)
 			msg.append(0xf0)
 			msg.append(0x0f)
-		
+
 		self.__write(msg)
 
 	def setPresetPattern(self, pattern, speed):
