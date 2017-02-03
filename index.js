@@ -125,7 +125,7 @@ MagicHomeAccessory.prototype.setToCurrentColor = function() {
 
 MagicHomeAccessory.prototype.setToWarmWhite = function() {
 	var brightness = this.brightness;
-	var base = '-x ' + this.setup + ' -w';
+	var base = '-x ' + this.setup + ' -w ';
 	this.sendCommand(base + brightness);
 };
 
