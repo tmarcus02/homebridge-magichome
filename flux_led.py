@@ -559,7 +559,7 @@ class WifiLedBulb():
 	def turnOff(self):
 		self.turnOn(False)
 
-	def setWarmWhite(self, level, persist=True, setup="RGBW"):
+	def setWarmWhite(self, level, persist=True):
 		if persist:
 			msg = bytearray([0x31])
 		else:
