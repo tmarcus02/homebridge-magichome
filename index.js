@@ -122,7 +122,7 @@ MagicHomeAccessory.prototype.setToCurrentColor = function()
 {
     var color = this.color;
 
-    if(color.S === 0 && color.H === 0 && this.purewhite)
+    if(color.S == 0 && color.H == 0 && this.purewhite)
     {
         this.setToWarmWhite();
         return;
