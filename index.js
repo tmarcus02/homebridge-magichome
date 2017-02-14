@@ -13,7 +13,7 @@ module.exports = function(homebridge)
     homebridge.registerAccessory('homebridge-magichome', 'MagicHome', MagicHomeAccessory, false);
 };
 
-function MagicHomeAccessory(log, config, api)
+function MagicHomeAccessory(log, config)
 {
 
     this.log = log;
@@ -76,8 +76,17 @@ MagicHomeAccessory.prototype.getServices = function()
 MagicHomeAccessory.prototype.sendCommand = function(command, callback)
 {
 	var exec = require('child_process').exec;
-	var cmd =  __dirname + '/flux_led.py ' + this.ip + ' ' + command;
-	exec(cmd, callback);
+	var cmd = "python " +  __dirname + '/flux_led.py ' + this.ip + ' ' + command;
+        //console.log("Send command " + cmd.toString());
+        try
+        {
+            exec(cmd, callback);
+        }
+        catch(e)
+        {
+            console.log("Send command Error " + e.message);  
+        }
+	
 };
 
 MagicHomeAccessory.prototype.getState = function (callback)

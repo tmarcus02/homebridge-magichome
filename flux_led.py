@@ -41,7 +41,7 @@ import socket
 import time
 import sys
 import datetime
-from optparse import OptionParser,OptionGroup
+from optparse import OptionParser, OptionGroup
 import ast
 try:
     import webcolors
@@ -49,7 +49,9 @@ try:
 except:
     webcolors_available = False
 
+
 class utils:
+
     @staticmethod
     def color_object_to_tuple(color):
         global webcolors_available
@@ -96,7 +98,7 @@ class utils:
         try:
             return webcolors.rgb_to_name(rgb)
         except Exception as e:
-            #print e
+            # print e
             pass
         return str(rgb)
 
@@ -128,13 +130,13 @@ class utils:
     def delayToSpeed(delay):
         # speed is 0-100, delay is 1-31
         # 1st translate delay to 0-30
-        delay = delay -1
-        if delay > utils.max_delay - 1 :
+        delay = delay - 1
+        if delay > utils.max_delay - 1:
             delay = utils.max_delay - 1
         if delay < 0:
             delay = 0
-        inv_speed = int((delay * 100)/(utils.max_delay - 1))
-        speed =  100-inv_speed
+        inv_speed = int((delay * 100) / (utils.max_delay - 1))
+        speed = 100 - inv_speed
         return speed
 
     @staticmethod
@@ -144,8 +146,8 @@ class utils:
             speed = 100
         if speed < 0:
             speed = 0
-        inv_speed = 100-speed
-        delay = int((inv_speed * (utils.max_delay-1))/100)
+        inv_speed = 100 - speed
+        delay = int((inv_speed * (utils.max_delay - 1)) / 100)
         # translate from 0-30 to 1-31
         delay = delay + 1
         return delay
@@ -156,7 +158,7 @@ class utils:
             byte = 255
         if byte < 0:
             byte = 0
-        return int((byte * 100)/255)
+        return int((byte * 100) / 255)
 
     @staticmethod
     def percentToByte(percent):
@@ -164,29 +166,31 @@ class utils:
             percent = 100
         if percent < 0:
             percent = 0
-        return int((percent * 255)/100)
+        return int((percent * 255) / 100)
+
 
 class PresetPattern:
-    seven_color_cross_fade =   0x25
-    red_gradual_change =       0x26
-    green_gradual_change =     0x27
-    blue_gradual_change =      0x28
-    yellow_gradual_change =    0x29
-    cyan_gradual_change =      0x2a
-    purple_gradual_change =    0x2b
-    white_gradual_change =     0x2c
-    red_green_cross_fade =     0x2d
-    red_blue_cross_fade =      0x2e
-    green_blue_cross_fade =    0x2f
+
+    seven_color_cross_fade = 0x25
+    red_gradual_change = 0x26
+    green_gradual_change = 0x27
+    blue_gradual_change = 0x28
+    yellow_gradual_change = 0x29
+    cyan_gradual_change = 0x2a
+    purple_gradual_change = 0x2b
+    white_gradual_change = 0x2c
+    red_green_cross_fade = 0x2d
+    red_blue_cross_fade = 0x2e
+    green_blue_cross_fade = 0x2f
     seven_color_strobe_flash = 0x30
-    red_strobe_flash =         0x31
-    green_strobe_flash =       0x32
-    blue_stobe_flash =         0x33
-    yellow_strobe_flash =      0x34
-    cyan_strobe_flash =        0x35
-    purple_strobe_flash =      0x36
-    white_strobe_flash =       0x37
-    seven_color_jumping =      0x38
+    red_strobe_flash = 0x31
+    green_strobe_flash = 0x32
+    blue_stobe_flash = 0x33
+    yellow_strobe_flash = 0x34
+    cyan_strobe_flash = 0x35
+    purple_strobe_flash = 0x36
+    white_strobe_flash = 0x37
+    seven_color_jumping = 0x38
 
     @staticmethod
     def valid(pattern):
@@ -202,7 +206,8 @@ class PresetPattern:
         return None
 
 
-class LedTimer():
+class LedTimer:
+
     Mo = 0x02
     Tu = 0x04
     We = 0x08
@@ -210,9 +215,9 @@ class LedTimer():
     Fr = 0x20
     Sa = 0x40
     Su = 0x80
-    Everyday = Mo|Tu|We|Th|Fr|Sa|Su
-    Weekdays = Mo|Tu|We|Th|Fr
-    Weekend = Sa|Su
+    Everyday = Mo | Tu | We | Th | Fr | Sa | Su
+    Weekdays = Mo | Tu | We | Th | Fr
+    Weekend = Sa | Su
 
     @staticmethod
     def dayMaskToStr(mask):
@@ -242,9 +247,9 @@ class LedTimer():
         # if no repeat mask and datetime is in past, return True
         if self.repeat_mask != 0:
             return False
-        elif self.year!=0 and self.month!=0 and self.day!=0:
+        elif self.year != 0 and self.month != 0 and self.day != 0:
             dt = datetime.datetime(self.year, self.month, self.day, self.hour, self.minute)
-            if  utils.date_has_passed(dt):
+            if utils.date_has_passed(dt):
                 return True
         return False
 
@@ -325,7 +330,7 @@ class LedTimer():
     """
 
     def fromBytes(self, bytes):
-        #utils.dump_bytes(bytes)
+        # utils.dump_bytes(bytes)
         self.red = 0
         self.green = 0
         self.blue = 0
@@ -333,7 +338,7 @@ class LedTimer():
             self.active = True
         else:
             self.active = False
-        self.year = bytes[1]+2000
+        self.year = bytes[1] + 2000
         self.month = bytes[2]
         self.day = bytes[3]
         self.hour = bytes[4]
@@ -347,10 +352,10 @@ class LedTimer():
             self.green = bytes[10]
             self.blue = bytes[11]
         elif self.pattern_code == 0x00:
-            self.mode ="default"
+            self.mode = "default"
         else:
             self.mode = "preset"
-            self.delay = bytes[9] #same byte as red
+            self.delay = bytes[9] # same byte as red
 
         self.warmth_level = bytes[12]
         if self.warmth_level != 0:
@@ -403,7 +408,7 @@ class LedTimer():
     def __str__(self):
         txt = ""
         if not self.active:
-          return "Unset"
+            return "Unset"
 
         if self.turn_on:
             txt += "[ON ]"
@@ -411,13 +416,12 @@ class LedTimer():
             txt += "[OFF]"
 
         txt += " "
-
-        txt += "{:02}:{:02}  ".format(self.hour,self.minute)
+        txt += "{:02}:{:02}  ".format(self.hour, self.minute)
 
         if self.repeat_mask == 0:
-            txt += "Once: {:04}-{:02}-{:02}".format(self.year,self.month,self.day)
+            txt += "Once: {:04}-{:02}-{:02}".format(self.year, self.month, self.day)
         else:
-            bits = [LedTimer.Su,LedTimer.Mo,LedTimer.Tu,LedTimer.We,LedTimer.Th,LedTimer.Fr,LedTimer.Sa]
+            bits = [LedTimer.Su, LedTimer.Mo, LedTimer.Tu, LedTimer.We, LedTimer.Th, LedTimer.Fr, LedTimer.Sa]
             for b in bits:
                 if self.repeat_mask & b:
                     txt += LedTimer.dayMaskToStr(b)
@@ -430,32 +434,30 @@ class LedTimer():
             if self.warmth_level != 0:
                 txt += "Warm White: {}%".format(utils.byteToPercent(self.warmth_level))
             else:
-                color_str = utils.color_tuple_to_string((self.red,self.green,self.blue))
+                color_str = utils.color_tuple_to_string((self.red, self.green, self.blue))
                 txt += "Color: {}".format(color_str)
 
         elif PresetPattern.valid(self.pattern_code):
             pat = PresetPattern.valtostr(self.pattern_code)
             speed = utils.delayToSpeed(self.delay)
             txt += "{} (Speed:{}%)".format(pat, speed)
-
         return txt
 
-class WifiLedBulb():
+
+class WifiLedBulb:
 
     def __init__(self, ipaddr, port=5577):
         self.ipaddr = ipaddr
         self.port = port
         self.__is_on = False
-
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((self.ipaddr, self.port))
-
         self.__state_str = ""
-        #self.refreshState()
+        # self.refreshState()
 
     def __determineMode(self, ww_level, pattern_code):
         mode = "unknown"
-        if pattern_code in [ 0x61, 0x62]:
+        if pattern_code in [0x61, 0x62]:
             # if ww_level != 0:
                 # mode = "ww"
             # else:
@@ -467,16 +469,15 @@ class WifiLedBulb():
         return mode
 
     def __writeRaw(self, bytes):
-
         self.socket.send(bytes)
 
     def __write(self, bytes):
         # calculate checksum of byte array and add to end
         csum = sum(bytes) & 0xFF
         bytes.append(csum)
-        #print "-------------",utils.dump_bytes(bytes)
+        # print "-------------",utils.dump_bytes(bytes)
         self.__writeRaw(bytes)
-        #time.sleep(.4)
+        # time.sleep(.4)
 
     def __readResponse(self, expected):
         remaining = expected
@@ -495,7 +496,6 @@ class WifiLedBulb():
         msg = bytearray([0x81, 0x8a, 0x8b])
         self.__write(msg)
         rx = self.__readResponse(14)
-
         power_state = rx[2]
         power_str = "Unknown power state"
 
@@ -534,21 +534,20 @@ class WifiLedBulb():
     def __str__(self):
         return self.__state_str
 
-
     def getClock(self):
         msg = bytearray([0x11, 0x1a, 0x1b, 0x0f])
         self.__write(msg)
         rx = self.__readResponse(12)
-        #self.dump_data(rx)
-        year =  rx[3] + 2000
+        # self.dump_data(rx)
+        year = rx[3] + 2000
         month = rx[4]
         date = rx[5]
         hour = rx[6]
         minute = rx[7]
         second = rx[8]
-        #dayofweek = rx[9]
+        # dayofweek = rx[9]
         try:
-            dt = datetime.datetime(year,month,date,hour,minute,second)
+            dt = datetime.datetime(year, month, date, hour, minute, second)
         except:
             dt = None
         return dt
@@ -574,9 +573,9 @@ class WifiLedBulb():
             msg = bytearray([0x71, 0x24, 0x0f])
 
         self.__write(msg)
-        #print "set bulb {}".format(on)
-        #time.sleep(.5)
-        #x = self.__readResponse(4)
+        # print "set bulb {}".format(on)
+        # time.sleep(.5)
+        # x = self.__readResponse(4)
         self.__is_on = on
 
     def isOn(self):
@@ -590,6 +589,7 @@ class WifiLedBulb():
             msg = bytearray([0x31])
         else:
             msg = bytearray([0x41])
+
         msg.append(0x00)  # Red
         msg.append(0x00)  # Green
         msg.append(0x00)  # Blue
@@ -637,19 +637,19 @@ class WifiLedBulb():
             msg.append(0x0f)
         self.__write(msg)
 
-def setPresetPattern(self, pattern, speed):
-    PresetPattern.valtostr(pattern)
-    if not PresetPattern.valid(pattern):
-        print "Pattern must be between 0x25 and 0x38"
-    raise Exception
+    def setPresetPattern(self, pattern, speed):
+        PresetPattern.valtostr(pattern)
+        if not PresetPattern.valid(pattern):
+            print "Pattern must be between 0x25 and 0x38"
+        raise Exception
 
-    delay = utils.speedToDelay(speed)
-    #print "speed {}, delay 0x{:02x}".format(speed,delay)
-    pattern_set_msg = bytearray([0x61])
-    pattern_set_msg.append(pattern)
-    pattern_set_msg.append(delay)
-    pattern_set_msg.append(0x0f)
-    self.__write(pattern_set_msg)
+        delay = utils.speedToDelay(speed)
+        # print "speed {}, delay 0x{:02x}".format(speed,delay)
+        pattern_set_msg = bytearray([0x61])
+        pattern_set_msg.append(pattern)
+        pattern_set_msg.append(delay)
+        pattern_set_msg.append(0x0f)
+        self.__write(pattern_set_msg)
 
     def getTimers(self):
         msg = bytearray([0x22, 0x2a, 0x2b, 0x0f])
@@ -660,16 +660,15 @@ def setPresetPattern(self, pattern, speed):
             print "response too short!"
         raise Exception
 
-        #utils.dump_data(rx)
+        # utils.dump_data(rx)
         start = 2
         timer_list = []
-        #pass in the 14-byte timer structs
+        # pass in the 14-byte timer structs
         for i in range(6):
-          timer_bytes = rx[start:][:14]
-          timer = LedTimer(timer_bytes)
-          timer_list.append(timer)
-          start += 14
-
+            timer_bytes = rx[start:][:14]
+            timer = LedTimer(timer_bytes)
+            timer_list.append(timer)
+            start += 14
         return timer_list
 
     def sendTimers(self, timer_list):
@@ -724,8 +723,8 @@ def setPresetPattern(self, pattern, speed):
                 first_color = False
             else:
                 lead_byte = 0
-            r,g,b = rgb
-            msg.extend(bytearray([lead_byte, r,g,b]))
+            r, g, b = rgb
+            msg.extend(bytearray([lead_byte, r, g, b]))
 
         # pad out empty slots
         if len(rgb_list) != 16:
@@ -735,31 +734,32 @@ def setPresetPattern(self, pattern, speed):
         msg.append(0x00)
         msg.append(utils.speedToDelay(speed))
 
-        if transition_type =="gradual":
+        if transition_type == "gradual":
             msg.append(0x3a)
-        elif transition_type =="jump":
+        elif transition_type == "jump":
             msg.append(0x3b)
-        elif transition_type =="strobe":
+        elif transition_type == "strobe":
             msg.append(0x3c)
         else:
-            #unknown transition string: using 'gradual'
+            # unknown transition string: using 'gradual'
             msg.append(0x3a)
-        msg.append(0xff)
-        msg.append(0x0f)
+            msg.append(0xff)
+            msg.append(0x0f)
 
         self.__write(msg)
 
 
-class  BulbScanner():
+class BulbScanner:
+
     def __init__(self):
         self.found_bulbs = []
 
     def getBulbInfoByID(self, id):
         bulb_info = None
-        for b in self.found_bulbs:
-            if b['id'] == id:
-                return b
-        return b
+        for bulb_info in self.found_bulbs:
+            if bulb_info['id'] == id:
+                return bulb_info
+        return bulb_info
 
     def getBulbInfo(self):
         return self.found_bulbs
@@ -768,7 +768,7 @@ class  BulbScanner():
 
         DISCOVERY_PORT = 48899
 
-        sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.bind(('', DISCOVERY_PORT))
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
@@ -807,6 +807,7 @@ class  BulbScanner():
         self.found_bulbs = response_list
         return response_list
 # =========================================================================
+
 
 def showUsageExamples():
 
@@ -926,6 +927,7 @@ Example setting strings:
 """
     print timerhelp_text
 
+
 def processSetTimerArgs(parser, args):
     mode = args[1]
     num = args[0]
@@ -935,7 +937,7 @@ def processSetTimerArgs(parser, args):
         parser.error("Timer number must be between 1 and 6")
 
     # create a dict from the settings string
-    settings_list=settings.split(";")
+    settings_list = settings.split(";")
     settings_dict = {}
     for s in settings_list:
         pair = s.split(":")
@@ -949,19 +951,19 @@ def processSetTimerArgs(parser, args):
     timer = LedTimer()
 
     if mode == "inactive":
-        #no setting needed
+        # no setting needed
         timer.setActive(False)
 
-    elif mode in ["poweroff", "default","color","preset","warmwhite"]:
+    elif mode in ["poweroff", "default", "color", "preset", "warmwhite"]:
         timer.setActive(True)
 
         if "time" not in keys:
             parser.error("This mode needs a time: {}".format(mode))
-        if  "repeat" in keys and "date" in keys:
+        if "repeat" in keys and "date" in keys:
             parser.error("This mode only a repeat or a date, not both: {}".format(mode))
 
         # validate time format
-        if len(settings_dict["time"]) != 4 or not settings_dict["time"].isdigit() :
+        if len(settings_dict["time"]) != 4 or not settings_dict["time"].isdigit():
             parser.error("time must be a 4 digits")
         hour = int(settings_dict["time"][0:2:])
         minute = int(settings_dict["time"][2:4:])
@@ -973,14 +975,14 @@ def processSetTimerArgs(parser, args):
         timer.setTime(hour, minute)
 
         # validate date format
-        if  "repeat" not in keys and "date" not in keys:
+        if "repeat" not in keys and "date" not in keys:
             # Generate date for next occurance of time
             print("No time or repeat given. Defaulting to next occurance of time")
             now = datetime.datetime.now()
             dt = now.replace(hour=hour, minute=minute)
             if utils.date_has_passed(dt):
                 dt = dt + datetime.timedelta(days=1)
-            #settings_dict["date"] = date
+            # settings_dict["date"] = date
             timer.setDate(dt.year, dt.month, dt.day)
         elif "date" in keys:
             try:
@@ -1000,34 +1002,42 @@ def processSetTimerArgs(parser, args):
                 days.add(int(c))
 
             repeat = 0
-            if 0 in days: repeat |= LedTimer.Su
-            if 1 in days: repeat |= LedTimer.Mo
-            if 2 in days: repeat |= LedTimer.Tu
-            if 3 in days: repeat |= LedTimer.We
-            if 4 in days: repeat |= LedTimer.Th
-            if 5 in days: repeat |= LedTimer.Fr
-            if 6 in days: repeat |= LedTimer.Sa
+
+            if 0 in days:
+                repeat |= LedTimer.Su
+            if 1 in days:
+                repeat |= LedTimer.Mo
+            if 2 in days:
+                repeat |= LedTimer.Tu
+            if 3 in days:
+                repeat |= LedTimer.We
+            if 4 in days:
+                repeat |= LedTimer.Th
+            if 5 in days:
+                repeat |= LedTimer.Fr
+            if 6 in days:
+                repeat |= LedTimer.Sa
             timer.setRepeatMask(repeat)
 
-        if  mode == "default":
+        if mode == "default":
             timer.setModeDefault()
 
-        if  mode == "poweroff":
+        if mode == "poweroff":
             timer.setModeTurnOff()
 
-        if  mode == "color":
-            if  "color" not in keys:
+        if mode == "color":
+            if "color" not in keys:
                 parser.error("color mode needs a color setting")
-            #validate color val
+            # validate color val
             c = utils.color_object_to_tuple(settings_dict["color"])
             if c is None:
                 parser.error("Invalid color value: {}".format(settings_dict["color"]))
-            timer.setModeColor(c[0],c[1],c[2])
+            timer.setModeColor(c[0], c[1], c[2])
 
-        if  mode == "preset":
-            if  "code" not in keys:
+        if mode == "preset":
+            if "code" not in keys:
                 parser.error("preset mode needs a code: {}".format(mode))
-            if  "speed" not in keys:
+            if "speed" not in keys:
                 parser.error("preset mode needs a speed: {}".format(mode))
             code = settings_dict["code"]
             speed = settings_dict["speed"]
@@ -1037,8 +1047,8 @@ def processSetTimerArgs(parser, args):
                 parser.error("preset code must be in valid range")
             timer.setModePresetPattern(int(code),int(speed))
 
-        if  mode == "warmwhite":
-            if  "level" not in keys:
+        if mode == "warmwhite":
+            if "level" not in keys:
                 parser.error("warmwhite mode needs a level: {}".format(mode))
             level = settings_dict["level"]
             if not level.isdigit() or int(level) > 100:
@@ -1049,7 +1059,9 @@ def processSetTimerArgs(parser, args):
 
     return timer
 
+
 def processCustomArgs(parser, args):
+
     if args[0] not in ["gradual", "jump", "strobe"]:
         parser.error("bad pattern type: {}".format(args[0]))
         return None
@@ -1071,17 +1083,18 @@ def processCustomArgs(parser, args):
                 raise Exception
 
     except:
-        parser.error("COLORLIST isn't formatted right.  It should be a space separated list of RGB tuples, color names or web hex values")
+        parser.error("COLORLIST isn't formatted.It should be space separated list of RGB tuples,color names or web hex")
 
     return args[0], speed, color_list
+
 
 def parseArgs():
 
     parser = OptionParser()
 
     parser.description = "A utility to control Flux WiFi LED Bulbs. "
-    #parser.description += ""
-    #parser.description += "."
+    # parser.description += ""
+    # parser.description += "."
     power_group = OptionGroup(parser, 'Power options (mutually exclusive)')
     mode_group = OptionGroup(parser, 'Mode options (mutually exclusive)')
     info_group = OptionGroup(parser, 'Program help and information option')
@@ -1133,7 +1146,6 @@ def parseArgs():
                               "TYPE should be jump, gradual, or strobe. SPEED is percent. " +
                               "COLORLIST is a should be a space-separated list of color names, web hex values, or comma-separated RGB triples")
     parser.add_option_group(mode_group)
-
     parser.add_option("-i", "--info",
                       action="store_true", dest="info", default=False,
                       help="Info about bulb(s) state")
@@ -1153,13 +1165,10 @@ def parseArgs():
                               "MODE: inactive, poweroff, default, color, preset, or warmwhite. " +
                               "SETTINGS: a string of settings including time, repeatdays or date, " +
                               "and other mode specific settings.   Use --timerhelp for more details.")
-
-
     other_group.add_option("-v", "--volatile",
                       action="store_true", dest="volatile", default=False,
                       help="Don't persist mode setting with hard power cycle (RGB and WW modes only).")
     parser.add_option_group(other_group)
-
     parser.usage = "usage: %prog [-sS10cwpCiltThe] [addr1 [addr2 [addr3] ...]."
     (options, args) = parser.parse_args()
 
@@ -1193,10 +1202,14 @@ def parseArgs():
         options.new_timer = None
 
     mode_count = 0
-    if options.color:  mode_count += 1
-    if options.ww:     mode_count += 1
-    if options.preset: mode_count += 1
-    if options.custom: mode_count += 1
+    if options.color:
+        mode_count += 1
+    if options.ww:
+        mode_count += 1
+    if options.preset:
+        mode_count += 1
+    if options.custom:
+        mode_count += 1
     if mode_count > 1:
         parser.error("options --color, --warmwhite, --preset, and --custom are mutually exclusive")
 
@@ -1220,25 +1233,33 @@ def parseArgs():
         options.info = True
 
     op_count = mode_count
-    if options.on:   op_count += 1
-    if options.off:  op_count += 1
-    if options.info: op_count += 1
-    if options.getclock: op_count += 1
-    if options.setclock: op_count += 1
-    if options.listpresets: op_count += 1
-    if options.settimer: op_count += 1
+    if options.on:
+        op_count += 1
+    if options.off:
+        op_count += 1
+    if options.info:
+        op_count += 1
+    if options.getclock:
+        op_count += 1
+    if options.setclock:
+        op_count += 1
+    if options.listpresets:
+        op_count += 1
+    if options.settimer:
+        op_count += 1
 
     if (not options.scan or options.scanresults) and (op_count == 0):
         parser.error("An operation must be specified")
 
     # if we're not scanning, IP addresses must be specified as positional args
-    if  not options.scan and not options.scanresults and not options.listpresets:
+    if not options.scan and not options.scanresults and not options.listpresets:
         if len(args) == 0:
             parser.error("You must specify at least one IP address as an argument, or use scan results")
 
+    return options, args
+# -------------------------------------------
 
-    return (options, args)
-#-------------------------------------------
+
 def main():
 
     (options, args) = parseArgs()
@@ -1257,7 +1278,6 @@ def main():
             for b in bulb_info_list:
                 print "  {} {}".format(b['id'], b['ipaddr'])
             sys.exit(0)
-
     else:
         addrs = args
         bulb_info_list = []
@@ -1267,18 +1287,18 @@ def main():
             info['id'] = 'Unknown ID'
             bulb_info_list.append(info)
 
-
     # now we have our bulb list, perform same operation on all of them
+
     for info in bulb_info_list:
         a = info['ipaddr']
         try:
             bulb = WifiLedBulb(info['ipaddr'])
         except Exception as e:
-            print "Unable to connect to bulb at [{}]: {}".format(info['ipaddr'],e)
+            print "Unable to connect to bulb at [{}]: {}".format(info['ipaddr'], e)
             continue
 
         if options.getclock:
-            print "{} [{}] {}".format(info['id'], info['ipaddr'],bulb.getClock())
+            print "{} [{}] {}".format(info['id'], info['ipaddr'], bulb.getClock())
 
         if options.setclock:
             bulb.setClock()
@@ -1294,15 +1314,15 @@ def main():
                 print
             else:
                 print "[{}]".format(name)
-            bulb.setRgb(options.color[0],options.color[1],options.color[2], not options.volatile, options.setup)
+            bulb.setRgb(options.color[0],options.color[1], options.color[2], not options.volatile, options.setup)
 
         elif options.custom is not None:
             bulb.setCustomPattern(options.custom[2], options.custom[1], options.custom[0])
-            print "Setting custom pattern: {}, Speed={}%, {}".format(
-                options.custom[0], options.custom[1], options.custom[2])
+            print "Setting custom pattern: {}, Speed={}%, {}".format(options.custom[0], options.custom[1],
+            options.custom[2])
 
         elif options.preset is not None:
-            print "Setting preset pattern: {}, Speed={}%".format(PresetPattern.valtostr(options.preset[0]), options.preset[1])
+            print "Setting preset pattern:{}, Speed={}%".format(PresetPattern.valtostr(options.preset[0]), options.preset[1])
             bulb.setPresetPattern(options.preset[0], options.preset[1])
 
         if options.on:
@@ -1314,12 +1334,12 @@ def main():
 
         if options.info:
             bulb.refreshState()
-            print "{} [{}] {}".format(info['id'], info['ipaddr'],bulb)
+            print "{} [{}] {}".format(info['id'], info['ipaddr'], bulb)
 
         if options.settimer:
             timers = bulb.getTimers()
             num = int(options.settimer[0])
-            print "New Timer ---- #{}: {}".format(num,options.new_timer)
+            print "New Timer ---- #{}: {}".format(num, options.new_timer)
             if options.new_timer.isExpired():
                 print "[timer is already expired, will be deactivated]"
             timers[num-1] = options.new_timer
@@ -1330,12 +1350,10 @@ def main():
             num = 0
             for t in timers:
                 num += 1
-                print "  Timer #{}: {}".format(num,t)
+                print "  Timer #{}: {}".format(num, t)
             print ""
 
-
     sys.exit(0)
-
 
 if __name__ == '__main__':
     main()
