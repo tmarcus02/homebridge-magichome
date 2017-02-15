@@ -93,7 +93,7 @@ MagicHomeAccessory.prototype.getState = function (callback)
 {
     this.sendCommand('-i', function(error, stdout)
     {
-        var settings = { on: false, color: {H: 255, S: 100, L: 50} };
+        var settings = { on: false, color: {H: 255, S: 50, L: 20} };
 
         var colors = stdout.match(/\(\d{3}\, \d{3}, \d{3}\)/g);
         var isOn = stdout.match(/\] ON /g);
@@ -120,23 +120,41 @@ MagicHomeAccessory.prototype.getColorFromDevice = function()
 
 MagicHomeAccessory.prototype.setToCurrentColor = function() 
 {
-    var color = this.color;
+    var v_color = this.color;
 
-    if(color.S == 0 && color.H == 0 && this.purewhite)
+    if(v_color.S === 0 && v_color.H === 0 && this.purewhite)
     {
         this.setToWarmWhite();
         return;
     }
+    else
+    {
+        v_color.L = 50;
+    }
+    
+    var v_brightness = this.brightness;
+    var converted = convert.hsl.rgb([v_color.H, v_color.S, v_color.L]);
+    var adjustForBrightness = converted; 
+    var i = 0;
+    
+    for(i = 0; i < converted.length; i++)
+    {
+        if(converted[i] > 0)
+        {
+            adjustForBrightness[i] = Math.round((converted[i] / 100) * v_brightness);
+        }
 
-    var brightness = this.brightness;
-    var converted = convert.hsl.rgb([color.H, color.S, color.L]);
-
-    var base = '-x ' + this.setup + ' -c';
-    this.sendCommand(base + Math.round((converted[0] / 100) * brightness) + ',' + Math.round((converted[1] / 100) * brightness) + ',' + Math.round((converted[2] / 100) * brightness));
-    color = null;
-    base = null;
-    brightness = null;
+    }
+    
+    var cmd = '-x ' + this.setup + ' -c ';
+    cmd += adjustForBrightness[0] + ',' + adjustForBrightness[1] + ',' + adjustForBrightness[2];
+    this.sendCommand(cmd);
+    
+    v_color = null;
+    v_brightness = null;
     converted = null;
+    adjustForBrightness = null;
+    cmd =null;
 };
 
 MagicHomeAccessory.prototype.setToWarmWhite = function()
