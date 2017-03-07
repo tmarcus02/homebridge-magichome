@@ -25,7 +25,7 @@ function MagicHomeAccessory(log, config)
     this.color = {H: 255, S:100, L:50};
     this.brightness = 100;
     this.purewhite = config.purewhite || false;
-
+    this.func = '';
     this.getColorFromDevice();
 
 }
@@ -120,41 +120,36 @@ MagicHomeAccessory.prototype.getColorFromDevice = function()
 
 MagicHomeAccessory.prototype.setToCurrentColor = function() 
 {
-    var v_color = this.color;
-
-    if(v_color.S === 0 && v_color.H === 0 && this.purewhite)
-    {
-        this.setToWarmWhite();
-        return;
-    }
-    else
-    {
-        v_color.L = 50;
-    }
+    var v_Color = this.color;
+    var v_Brightness = this.brightness;
     
-    var v_brightness = this.brightness;
-    var converted = convert.hsl.rgb([v_color.H, v_color.S, v_color.L]);
-    var adjustForBrightness = converted; 
-    var i = 0;
-    
-    for(i = 0; i < converted.length; i++)
+    if (v_Color.S === 0 && v_Color.H === 0) 
     {
-        if(converted[i] > 0)
+	if(this.purewhite) 
         {
-            adjustForBrightness[i] = Math.round((converted[i] / 100) * v_brightness);
+		this.setToWarmWhite();
+		return;
+        } else 
+        {
+	       	v_Color.L = this.brightness;
+		v_Brightness = 100;
         }
-
+    } else 
+    {
+        v_Color.L = 50;
     }
+    
+    var converted = convert.hsl.rgb([v_Color.H, v_Color.S, v_Color.L]);
+  
+    converted[0] = Math.round((converted[0] / 100) * v_Brightness);
+    converted[1] = Math.round((converted[1] / 100) * v_Brightness);
+    converted[2] = Math.round((converted[2] / 100) * v_Brightness);
     
     var cmd = '-x ' + this.setup + ' -c ';
-    cmd += adjustForBrightness[0] + ',' + adjustForBrightness[1] + ',' + adjustForBrightness[2];
+    cmd += converted[0] + ',' + converted[1] + ',' + converted[2];
     this.sendCommand(cmd);
     
-    v_color = null;
-    v_brightness = null;
     converted = null;
-    adjustForBrightness = null;
-    cmd =null;
 };
 
 MagicHomeAccessory.prototype.setToWarmWhite = function()
@@ -195,9 +190,9 @@ MagicHomeAccessory.prototype.getHue = function(callback)
 MagicHomeAccessory.prototype.setHue = function(value, callback)
 {
     this.color.H = value;
-    this.setToCurrentColor();
+    clearTimeout(this.func);
+    this.func = setTimeout(this.setToCurrentColor.bind(this), 50);
     this.log("HUE: %s", value);
-
     callback();
 };
 
@@ -212,7 +207,8 @@ MagicHomeAccessory.prototype.getBrightness = function(callback)
 MagicHomeAccessory.prototype.setBrightness = function(value, callback)
 {
     this.brightness = value;
-    this.setToCurrentColor();
+    clearTimeout(this.func);
+    this.func = setTimeout(this.setToCurrentColor.bind(this), 20);
     this.log("BRIGHTNESS: %s", value);
     callback();
 };
@@ -228,7 +224,8 @@ MagicHomeAccessory.prototype.getSaturation = function(callback)
 MagicHomeAccessory.prototype.setSaturation = function(value, callback)
 {
     this.color.S = value;
-    this.setToCurrentColor();
+    clearTimeout(this.func);
+    this.func = setTimeout(this.setToCurrentColor.bind(this), 50);
     this.log("SATURATION: %s", value);
 
     callback();
